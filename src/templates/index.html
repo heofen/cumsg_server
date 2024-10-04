@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        #chat-container {
+            width: 400px;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #message-input {
+            display: flex;
+        }
+
+        #message-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 0 0 0 10px;
+            font-size: 16px;
+        }
+
+        #message-input button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 0 0 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #message-input button:hover {
+            background-color: #0056b3;
+        }
+
+        #message-input input:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="message-input">
+            <input type="text" id="message" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://127.0.0.1:3030/ws');
+        username = "";
+
+        ws.onopen = () => {
+            console.log('Connected to WebSocket server');
+        };
+
+        ws.onmessage = (event) => {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            const chatMessage = JSON.parse(event.data);
+            messageElement.textContent = chatMessage.username + ': ' + chatMessage.content;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            if (username == "") {
+                username = prompt("Enter your username") || "Анонiст";
+            }
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                const chatMessage = { username: username, content: message };
+                ws.send(JSON.stringify(chatMessage));
+                messageInput.value = '';
+            }
+        }
+
+        ws.onclose = () => {
+            console.log('Disconnected from WebSocket server');
+        };
+    </script>
+</body>
+</html>
