@@ -76,7 +76,7 @@
 
     <script>
         const ws = new WebSocket('ws://127.0.0.1:3030/ws');
-        username = "";
+        username = "Анонiст";
 
         ws.onopen = () => {
             console.log('Connected to WebSocket server');
@@ -93,7 +93,7 @@
 
         function sendMessage() {
             const messageInput = document.getElementById('message');
-            if (username == "") {
+            if (username == "Анонiст") {
                 username = prompt("Enter your username") || "Анонiст";
             }
             const message = messageInput.value;
